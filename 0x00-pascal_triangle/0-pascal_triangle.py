@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+"""This module defines the function pascal_triangle
+that takes in nth integer argument.
+"""
+
 
 def pascal_triangle(n):
     """
