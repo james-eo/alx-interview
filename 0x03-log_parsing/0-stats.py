@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""This module contains the implementation of log parsing"""
 import sys
 import signal
 
