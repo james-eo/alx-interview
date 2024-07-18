@@ -1,52 +1,40 @@
-#!/usr/bin/env python3
-"""This module contains the implementation of log parsing"""
+#!/usr/bin/python3
+"""This module reads stdin line by line and computes metrics"""
 import sys
-import signal
 
-total_file_size = 0
-status_codes = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
-line_count = 0
+status_codes = [200, 301, 400, 401, 403, 404, 405, 500]
+num_lines_read = 0
+status_code_map = {}
+file_size = 0
 
 
 def print_stats():
     """Function to print the current statistics."""
-    print(f"File size: {total_file_size}")
-    for code in sorted(status_codes.keys()):
-        if status_codes[code] > 0:
-            print(f"{code}: {status_codes[code]}")
+    print("File size: {}".format(file_size))
+    for stat, count in sorted(status_code_map.items()):
+        print("{}: {}".format(stat, count))
 
 
-def handle_interrupt(signum, frame):
-    """Function to handle keyboard interruption (CTRL + C)."""
-    print_stats()
-    sys.exit(0)
-
-
-signal.signal(signal.SIGINT, handle_interrupt)
-
-for line in sys.stdin:
-    try:
-        parts = line.split()
-        if len(parts) != 9:
-            continue
-
-        ip = parts[0]
-        date = parts[3][1:]
-        request = parts[5][1:]
-        status_code = int(parts[8])
-        file_size = int(parts[9])
-
-        total_file_size += file_size
-
-        if status_code in status_codes:
-            status_codes[status_code] += 1
-
-        line_count += 1
-
-        if line_count % 10 == 0:
+try:
+    for line in sys.stdin:
+        line_token = line.split()
+        try:
+            f_size = int(line_token[-1])
+            file_size += f_size
+            status_code = int(line_token[-2])
+            if status_code in status_codes:
+                if status_code in status_code_map:
+                    status_code_map[status_code] += 1
+                else:
+                    status_code_map[status_code] = 1
+        except ValueError:
+            pass
+        num_lines_read += 1
+        if num_lines_read % 10 == 0:
             print_stats()
 
-    except Exception:
-        continue
+    if (num_lines_read == 0) or (num_lines_read % 10 != 0):
+        print_stats()
 
-print_stats()
+except (KeyboardInterrupt):
+    print_stats()
