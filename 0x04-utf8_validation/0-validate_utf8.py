@@ -12,21 +12,24 @@ def validUTF8(data):
     Returns:
         True if data is a valid UTF-8 encoding, else False.
     """
-    num_bytes = 0
-
-    for byte in data:
-        if num_bytes == 0:
-            if (byte >> 5) == 0b110:
-                num_bytes = 1
-            elif (byte >> 4) == 0b1110:
-                num_bytes = 2
-            elif (byte >> 3) == 0b11110:
-                num_bytes = 3
-            elif (byte >> 7) != 0:
+    i = 0
+    while i < len(data):
+        if data[i] & 0x80 == 0x00:
+            i += 1
+        elif data[i] & 0xE0 == 0xC0:
+            if i + 1 >= len(data) or data[i + 1] & 0xC0 != 0x80:
                 return False
+            i += 2
+        elif data[i] & 0xF0 == 0xE0:
+            if i + 2 >= len(data) or data[i + 1] & 0xC0 != 0x80 or data[i + 2]\
+                    & 0xC0 != 0x80:
+                return False
+            i += 3
+        elif data[i] & 0xF8 == 0xF0:
+            if i + 3 >= len(data) or data[i + 1] & 0xC0 != 0x80 or data[i + 2]\
+                    & 0xC0 != 0x80 or data[i + 3] & 0xC0 != 0x80:
+                return False
+            i += 4
         else:
-            if (byte >> 6) != 0b10:
-                return False
-            num_bytes -= 1
-
-    return num_bytes == 0
+            return False
+    return True
