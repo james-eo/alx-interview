@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+"""This module contains a function that impplements utf-8 validation"""
+
 
 def validUTF8(data):
     """
