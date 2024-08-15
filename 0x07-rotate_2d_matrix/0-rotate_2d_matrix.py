@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """
 Rotate 2D Matrix Module
 This module provides a function to rotate an n x n 2D matrix
